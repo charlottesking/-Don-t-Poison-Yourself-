@@ -136,7 +136,7 @@ function addAllergen(name) {
     if (!exists) {
         allergens.push(cleanName);
         saveAllergens(allergens);
-        displayAllergens();
+        afterAllergensChanged();
     }
 }
 
@@ -144,7 +144,72 @@ function deleteAllergen(index) {
     const allergens = loadAllergens();
     allergens.splice(index, 1);
     saveAllergens(allergens);
+    afterAllergensChanged();
+}
+
+// Runs whenever an allergen is added or removed:
+// re-checks saved products, refreshes the page, and says what changed
+function afterAllergensChanged() {
+    const changes = recheckSavedProducts();
     displayAllergens();
+    displayProducts();
+    showRecheckNotice(changes);
+}
+
+// Re-checks every saved product against the current allergen list.
+// Returns which products just became "Avoid" and which just became "Safe".
+function recheckSavedProducts() {
+    const allergens = loadAllergens();
+    const products = loadProducts();
+    const changes = { nowAvoid: [], nowSafe: [] };
+
+    products.forEach(p => {
+        // Products saved before this feature don't have their ingredient list stored
+        if (!p.ingredients) return;
+
+        const triggers = checkIngredients(p.ingredients, allergens);
+        const isSafe = triggers.length === 0;
+
+        if (p.safe && !isSafe) changes.nowAvoid.push(p.name);
+        if (!p.safe && isSafe) changes.nowSafe.push(p.name);
+
+        p.triggers = triggers;
+        p.safe = isSafe;
+    });
+
+    saveProducts(products);
+    return changes;
+}
+
+// Shows a short message under My Allergies when saved products changed
+let recheckNoticeTimer = null;
+
+function showRecheckNotice(changes) {
+    const noticeEl = document.getElementById('recheck-notice');
+    if (!noticeEl) return;
+
+    const lines = [];
+    if (changes.nowAvoid.length > 0) {
+        lines.push(`⚠️ Now marked <strong>Avoid</strong>: ${escapeHtml(changes.nowAvoid.join(', '))}`);
+    }
+    if (changes.nowSafe.length > 0) {
+        lines.push(`✅ Now marked <strong>Safe</strong>: ${escapeHtml(changes.nowSafe.join(', '))}`);
+    }
+
+    if (lines.length === 0) {
+        noticeEl.innerHTML = '';
+        return;
+    }
+
+    noticeEl.innerHTML = `
+        <div class="recheck-notice">
+            <strong>Re-checked your saved products</strong>
+            ${lines.map(line => `<span>${line}</span>`).join('')}
+        </div>`;
+
+    // Hide the message after 8 seconds
+    clearTimeout(recheckNoticeTimer);
+    recheckNoticeTimer = setTimeout(() => { noticeEl.innerHTML = ''; }, 8000);
 }
 
 const allergenForm = document.getElementById('allergen-form');
@@ -249,6 +314,11 @@ function displayProducts() {
         const brandText = prod.brand ? `<span class="history-brand">${escapeHtml(prod.brand)}</span> • ` : '';
         const categoryBadge = prod.category ? `<span class="category-badge">${escapeHtml(prod.category)}</span>` : '';
         const notesLine = prod.notes ? `<div class="history-notes">"${escapeHtml(prod.notes)}"</div>` : '';
+        const patchLine = prod.patchResult === 'passed'
+            ? '<span class="patch-badge patch-passed">🧪 Patch test passed</span>'
+            : prod.patchResult === 'failed'
+                ? '<span class="patch-badge patch-failed">🧪 Patch test failed</span>'
+                : '';
 
         const info = document.createElement('div');
         info.className = 'history-info';
@@ -264,6 +334,7 @@ function displayProducts() {
                         : `<span class="badge-danger">Avoid ⚠️ (${escapeHtml(prod.triggers.join(', '))})</span>`}
                 </div>
             </div>
+            ${patchLine}
             ${notesLine}
         `;
 
@@ -477,6 +548,7 @@ if (checkerForm) {
             notes: notes,
             safe: isSafe,
             triggers: matches,
+            ingredients: trimmedIngredients, // kept so the product can be re-checked later
             date: todayString()
         };
 
@@ -912,6 +984,11 @@ function exportToCSV() {
                    `${r.severity}/5`, r.notes]);
     });
 
+    loadPatchTests().forEach(t => {
+        const result = t.status === 'passed' ? 'Passed' : t.status === 'failed' ? 'Failed' : 'In progress';
+        rows.push(['Patch Test', dateStringFromTime(t.start), t.product, '', '', result, '', t.spot, '', '']);
+    });
+
     const csv = rows.map(row => row.map(csvCell).join(',')).join('\n');
 
     // Turn the text into a file and make the browser download it
@@ -1092,3 +1169,193 @@ if (directorySearchInput) {
 }
 
 displayDirectory();
+
+/* =========================================================
+   11. PATCH TEST TRACKER
+   ========================================================= */
+const PATCH_TEST_HOURS = 48;
+const PATCH_TEST_MS = PATCH_TEST_HOURS * 60 * 60 * 1000; // 48 hours in milliseconds
+
+function loadPatchTests() {
+    try {
+        const saved = localStorage.getItem('patchTests');
+        return saved ? JSON.parse(saved) : [];
+    } catch (err) {
+        console.error('Error loading patch tests from storage:', err);
+        return [];
+    }
+}
+
+function savePatchTests(tests) {
+    try {
+        localStorage.setItem('patchTests', JSON.stringify(tests));
+    } catch (err) {
+        console.error('Error saving patch tests to storage:', err);
+    }
+}
+
+// A timestamp -> "2026-10-12" (used for the CSV export)
+function dateStringFromTime(time) {
+    const d = new Date(time);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// A timestamp -> "Oct 12, 3:05 PM"
+function formatDateTime(time) {
+    return new Date(time).toLocaleString('en-US', {
+        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+}
+
+// Milliseconds -> "31h 12m"
+function formatTimeLeft(ms) {
+    const hours = Math.floor(ms / (60 * 60 * 1000));
+    const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+    return `${hours}h ${minutes}m`;
+}
+
+function displayPatchTests() {
+    const listEl = document.getElementById('patch-list');
+    if (!listEl) return;
+
+    const tests = loadPatchTests();
+    listEl.innerHTML = '';
+
+    if (tests.length === 0) {
+        listEl.innerHTML = '<li class="empty-state">No patch tests yet. Start one when you try a new product.</li>';
+        return;
+    }
+
+    // Running tests first, then newest first
+    const sorted = [...tests].sort((a, b) => {
+        const aActive = a.status === 'active' ? 0 : 1;
+        const bActive = b.status === 'active' ? 0 : 1;
+        return aActive - bActive || b.start - a.start;
+    });
+
+    sorted.forEach(test => {
+        const li = document.createElement('li');
+        li.className = 'history-item patch-item';
+
+        const info = document.createElement('div');
+        info.className = 'history-info';
+
+        if (test.status === 'active') {
+            const elapsed = Date.now() - test.start;
+            const percent = Math.min(100, Math.round((elapsed / PATCH_TEST_MS) * 100));
+            const isDone = elapsed >= PATCH_TEST_MS;
+
+            info.innerHTML = `
+                <div class="history-header">
+                    <strong>${escapeHtml(test.product)}</strong>
+                    <span class="patch-status ${isDone ? 'patch-ready' : 'patch-running'}">
+                        ${isDone ? '⏰ Ready to check' : `⏳ ${formatTimeLeft(PATCH_TEST_MS - elapsed)} left`}
+                    </span>
+                </div>
+                <div class="history-brand">${escapeHtml(test.spot)} · started ${formatDateTime(test.start)}</div>
+                <div class="patch-progress" role="progressbar" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100" aria-label="Patch test progress">
+                    <div class="patch-progress-fill" style="width: ${percent}%"></div>
+                </div>
+                <p class="patch-question">${isDone ? '48 hours are up! How does your skin look?' : 'Check in early if you notice anything:'}</p>
+                <div class="patch-actions">
+                    <button type="button" class="patch-btn patch-btn-pass">✓ No reaction</button>
+                    <button type="button" class="patch-btn patch-btn-fail">✗ I reacted</button>
+                </div>
+            `;
+
+            info.querySelector('.patch-btn-pass').addEventListener('click', () => finishPatchTest(test.id, 'passed'));
+            info.querySelector('.patch-btn-fail').addEventListener('click', () => finishPatchTest(test.id, 'failed'));
+        } else {
+            const passed = test.status === 'passed';
+            info.innerHTML = `
+                <div class="history-header">
+                    <strong>${escapeHtml(test.product)}</strong>
+                    <span class="patch-status ${passed ? 'patch-passed' : 'patch-failed'}">
+                        ${passed ? '✓ Passed' : '✗ Reacted'}
+                    </span>
+                </div>
+                <div class="history-brand">${escapeHtml(test.spot)} · started ${formatDateTime(test.start)}</div>
+                ${passed ? '' : '<a href="#reaction-form" class="patch-log-link">Log this reaction →</a>'}
+            `;
+
+            const logLink = info.querySelector('.patch-log-link');
+            if (logLink) {
+                logLink.addEventListener('click', () => {
+                    const productInput = document.getElementById('reaction-product');
+                    if (productInput) {
+                        productInput.value = test.product;
+                        productInput.focus();
+                    }
+                });
+            }
+        }
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.setAttribute('aria-label', `Delete patch test for ${test.product}`);
+        deleteBtn.addEventListener('click', () => deletePatchTest(test.id));
+
+        li.appendChild(info);
+        li.appendChild(deleteBtn);
+        listEl.appendChild(li);
+    });
+}
+
+// Records the result, and marks any saved product with the same name
+function finishPatchTest(id, result) {
+    const tests = loadPatchTests();
+    const test = tests.find(t => t.id === id);
+    if (!test) return;
+
+    test.status = result;
+    savePatchTests(tests);
+
+    const products = loadProducts();
+    products.forEach(p => {
+        if (p.name.toLowerCase() === test.product.toLowerCase()) {
+            p.patchResult = result;
+        }
+    });
+    saveProducts(products);
+
+    displayPatchTests();
+}
+
+function deletePatchTest(id) {
+    savePatchTests(loadPatchTests().filter(t => t.id !== id));
+    displayPatchTests();
+}
+
+const patchForm = document.getElementById('patch-form');
+if (patchForm) {
+    patchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const productInput = document.getElementById('patch-product');
+        const product = productInput.value.trim();
+        if (!product) {
+            productInput.focus();
+            return;
+        }
+
+        const tests = loadPatchTests();
+        tests.push({
+            id: Date.now(),
+            product: product,
+            spot: document.getElementById('patch-spot').value,
+            start: Date.now(),
+            status: 'active'
+        });
+        savePatchTests(tests);
+
+        patchForm.reset();
+        displayPatchTests();
+    });
+
+    // Update the countdowns every 30 seconds
+    setInterval(displayPatchTests, 30 * 1000);
+}
+
+displayPatchTests();

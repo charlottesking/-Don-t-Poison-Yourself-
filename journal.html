@@ -9,7 +9,7 @@
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <!-- Header & Navigation -->
+        <!-- Header & Navigation -->
     <header class="dashboard-header">
         <div class="header-content">
             <h1>
@@ -85,14 +85,36 @@
             </form>
         </section>
 
-        <!-- Widget 2: Your Reactions -->
+        <!-- Widget 2: Patch Tests -->
+        <section class="widget" id="patch-widget">
+            <h2>Patch Tests</h2>
+            <p class="page-intro">Trying something new? Dab a little on a small patch of skin and wait 48 hours before using it everywhere.</p>
+            <form id="patch-form">
+                <label for="patch-product">Product <span class="required-star">*</span></label>
+                <input type="text" id="patch-product" list="product-suggestions" placeholder="e.g. New Night Cream" required>
+
+                <label for="patch-spot">Test spot</label>
+                <select id="patch-spot">
+                    <option value="Inner arm">Inner arm</option>
+                    <option value="Behind the ear">Behind the ear</option>
+                    <option value="Jawline">Jawline</option>
+                    <option value="Wrist">Wrist</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <button type="submit">Start 48-Hour Test</button>
+            </form>
+            <ul id="patch-list"></ul>
+        </section>
+
+        <!-- Widget 3: Your Reactions -->
         <section class="widget">
             <h2>Your Reactions</h2>
             <div id="reaction-stats"></div>
             <ul id="reaction-list"></ul>
         </section>
 
-        <!-- Widget 3: Reaction Trends -->
+        <!-- Widget 4: Reaction Trends -->
         <section class="widget">
             <h2>Reaction Trends</h2>
             <h3 class="chart-title chart-title-first">Reactions by Month</h3>
