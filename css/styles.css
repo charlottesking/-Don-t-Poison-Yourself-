@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@400;700&display=swap');
 
 /* =========================================================
    1. RESET
@@ -21,28 +21,27 @@ img {
    2. DESIGN TOKENS
    ========================================================= */
 :root {
-    /* Pink Palette Tokens */
-    --color-accent: #db2777;      
-    --color-accent-hover: #be185d; 
-    --color-accent-light: #fdf2f8; 
+    /* Pink palette */
+    --color-accent: #db2777;
+    --color-accent-hover: #be185d;
+    --color-accent-light: #fdf2f8;
     --color-accent-border: #fbcfe8;
     --color-danger: #b42318;
     --color-danger-bg: #fee2e2;
     --color-safe: #15803d;
     --color-safe-bg: #dcfce7;
-    --color-text: #1e1b2e;         
+    --color-warning: #eab308;
+    --color-text: #1e1b2e;
     --color-muted: #6b7280;
-    --color-border: #f472b6;       
-    --color-bg: #fff5f8;           
+    --color-border: #f472b6;
+    --color-bg: #fff5f8;
     --color-surface: #ffffff;
     --color-header-bg: #ffe4e9;
 
-    --radius-lg: 14px;
     --radius-md: 8px;
     --radius-pill: 9999px;
 
     --shadow-sm: 0 1px 3px rgba(219, 39, 119, 0.06);
-    --shadow-md: 0 8px 20px rgba(219, 39, 119, 0.1);
 
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -51,11 +50,8 @@ img {
     --space-xl: 2rem;
 
     --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-serif: 'Lora', Georgia, serif; 
+    --font-serif: 'Lora', Georgia, serif;
     --text-base: 1rem;
-    --text-h3: 1.25rem;
-    --text-h2: 1.5rem;
-    --text-h1: 2.25rem;
     --leading-body: 1.6;
     --leading-heading: 1.2;
 }
@@ -63,13 +59,12 @@ img {
 body.theme-dark {
     --color-bg: #141a26;
     --color-surface: #1f2937;
-    --color-surface-alt: #273142;
     --color-header-bg: #1a2234;
     --color-text: #f7fafc;
     --color-muted: #a9b4c4;
     --color-border: #2c3648;
     --color-accent: #c9a9f0;
-    --color-accent-strong: #e2d1f7;
+    --color-accent-hover: #b48ee8;
     --color-accent-border: #3b4252;
     --color-accent-light: #2c3648;
     --color-danger: #f97066;
@@ -79,29 +74,19 @@ body.theme-dark {
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-h1, h2, h3 {
-    font-family: var(--font-serif);
-    line-height: var(--leading-heading);
-}
-
 /* =========================================================
    3. BASE ELEMENT STYLES
    ========================================================= */
-:focus-visible {
-    outline: 3px solid var(--color-accent);
-    outline-offset: 3px;
-    border-radius: 4px;
-}
-
 body {
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-stack);
-    line-height: var(--leading-body);
     font-size: var(--text-base);
+    line-height: var(--leading-body);
 }
 
 h1, h2, h3, h4 {
+    font-family: var(--font-serif);
     color: var(--color-text);
     line-height: var(--leading-heading);
 }
@@ -117,16 +102,21 @@ p:last-child {
 a {
     color: var(--color-accent);
     text-decoration: none;
-    transition: opacity 0.2s ease;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Hidden above the page until someone presses Tab (fully off-screen so no sliver shows) */
 .skip-link {
     position: absolute;
-    top: -40px;
+    top: -100px;
     left: 0;
     background: var(--color-accent);
     color: var(--color-surface);
@@ -138,17 +128,181 @@ a:hover {
     top: 0;
 }
 
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+/* =========================================================
+   4. HEADER
+   ========================================================= */
+.dashboard-header {
+    background-color: var(--color-header-bg);
+    border-bottom: 1px solid var(--color-accent-border);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Wide screens: title on the left, page tabs and buttons on the right */
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: "title nav actions";
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.dashboard-header h1 {
+    grid-area: title;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);  /* big on laptops, a bit smaller on tablets */
+    white-space: nowrap;                      /* keep the title on one line */
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Page tabs: one pill-shaped bar, the current page filled in */
+.nav-links {
+    grid-area: nav;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-accent-border);
+    border-radius: var(--radius-pill);
+}
+
+.nav-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-pill);
+    text-align: center;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--color-accent);
+    background-color: var(--color-accent-light);
+    text-decoration: none;
+}
+
+.nav-link.active,
+.nav-link.active:hover {
+    color: var(--color-surface);
+    background-color: var(--color-accent);
+}
+
+/* Export + Dark Mode buttons */
+.header-actions {
+    grid-area: actions;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+button.header-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-accent-border);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+button.header-btn:hover {
+    background-color: var(--color-accent-light);
+    border-color: var(--color-accent);
+}
+
+/* Dark mode button shows 🌙 "Dark Mode" in light mode, ☀️ "Light Mode" in dark mode */
+.show-when-dark {
+    display: none;
+}
+
+body.theme-dark .show-when-dark {
+    display: inline;
+}
+
+body.theme-dark .show-when-light {
+    display: none;
+}
+
+/* Medium screens: tabs move to their own full-width row under the title */
+@media (max-width: 1050px) {
+    .header-content {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "title actions"
+            "nav   nav";
+    }
+
+    .nav-link {
+        flex: 1;
+    }
+}
+
+/* Phones: title gets its own row, tabs and round icon buttons share the row below */
+@media (max-width: 720px) {
+    .dashboard-header {
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+
+    .header-content {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "title title"
+            "nav   actions";
+    }
+
+    .btn-text,
+    body.theme-dark .btn-text {
+        display: none;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.6rem;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .nav-link {
+        padding: 0.35rem 0.5rem;
+    }
+
+    button.header-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        font-size: 1rem;
+    }
+}
+
+/* Very small phones: squeeze the tabs and buttons a little more */
+@media (max-width: 360px) {
+    .nav-link {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.4rem;
+    }
+
+    .header-actions {
+        gap: var(--space-xs);
+    }
+
+    button.header-btn {
+        width: 34px;
+        height: 34px;
+    }
 }
 
 /* =========================================================
-   4. LAYOUT & CARDS
+   5. DASHBOARD LAYOUT & WIDGET CARDS
    ========================================================= */
-main,
 .dashboard-grid {
     max-width: 1200px;
     margin: 0 auto 3rem;
@@ -167,7 +321,7 @@ main,
     border-top: 4px solid var(--color-accent);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
 .widget:hover {
@@ -178,126 +332,14 @@ main,
     margin-bottom: var(--space-md);
 }
 
-/* Multi-column form layout */
-.form-row {
-    display: flex;
-    gap: var(--space-sm);
-}
-
-.form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-select {
-    width: 100%;
-    padding: var(--space-sm);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    font-family: inherit;
-    font-size: var(--text-base);
-    margin-bottom: var(--space-sm);
-    cursor: pointer;
-}
-
-/* =========================================================
-   5. HEADER & FOOTER
-   ========================================================= */
-header,
-.dashboard-header {
-    background-color: var(--color-header-bg);
-    border-bottom: 1px solid var(--color-accent-border);
-    padding: var(--space-lg) var(--space-xl);
-    margin-bottom: var(--space-xl);
-    box-shadow: var(--shadow-sm);
-}
-
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin: 0;
-}
-
-#theme-toggle {
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-accent-border);
-    padding: 0.35rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    border-radius: var(--radius-pill);
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-#theme-toggle:hover {
-    background-color: var(--color-accent-light);
-    border-color: var(--color-accent);
-}
-
-/* =========================================================
-   6. SUMMARY STATS PILLS
-   ========================================================= */
-.stats-row {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-bottom: var(--space-sm);
-    flex-wrap: wrap;
-}
-
-.stat-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.72rem;
+.empty-state {
     color: var(--color-muted);
-    background-color: var(--color-accent-light);
-    border: 1px solid var(--color-accent-border);
-    padding: 0.15rem 0.5rem;
-    border-radius: var(--radius-pill);
-    line-height: 1.2;
-}
-
-.stat-pill strong {
-    color: var(--color-text);
-}
-
-.stat-pill.stat-safe {
-    background-color: var(--color-safe-bg);
-    color: var(--color-safe);
-    border-color: rgba(21, 128, 61, 0.25);
-}
-
-.stat-pill.stat-safe strong {
-    color: var(--color-safe);
-}
-
-.stat-pill.stat-avoid {
-    background-color: var(--color-danger-bg);
-    color: var(--color-danger);
-    border-color: rgba(180, 35, 24, 0.25);
-}
-
-.stat-pill.stat-avoid strong {
-    color: var(--color-danger);
+    font-style: italic;
+    font-size: 0.85rem;
 }
 
 /* =========================================================
-   7. FORMS & CONTROLS
+   6. FORMS & INPUTS
    ========================================================= */
 form {
     display: flex;
@@ -319,7 +361,9 @@ label {
 }
 
 input[type="text"],
-textarea {
+input[type="date"],
+textarea,
+select {
     width: 100%;
     padding: var(--space-sm);
     border: 1px solid var(--color-border);
@@ -331,6 +375,10 @@ textarea {
     margin-bottom: var(--space-sm);
 }
 
+select {
+    cursor: pointer;
+}
+
 .input-row {
     display: flex;
     gap: var(--space-sm);
@@ -340,6 +388,59 @@ textarea {
     margin-bottom: 0;
 }
 
+/* Two fields side by side */
+.form-row {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   7. BUTTONS
+   ========================================================= */
+button {
+    font: inherit;
+    font-weight: 600;
+    padding: var(--space-sm) var(--space-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    background-color: var(--color-accent);
+    color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--color-accent-hover);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Small text-style delete button (tags & history) */
+button.delete-btn {
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px 6px;
+}
+
+button.delete-btn:hover {
+    color: var(--color-danger);
+    text-decoration: underline;
+}
+
+/* =========================================================
+   8. MY ALLERGIES (TAGS + QUICK-ADD)
+   ========================================================= */
 #allergen-list {
     list-style: none;
     display: flex;
@@ -359,14 +460,153 @@ textarea {
     color: var(--color-text);
 }
 
-.empty-state {
+.allergen-tag button.delete-btn {
+    font-size: 1.1rem;
+    margin-left: 0.25rem;
+    padding: 0;
+    color: var(--color-danger);
+    line-height: 1;
+}
+
+.quick-add-label {
+    font-size: 0.8rem;
+    font-weight: 400;
     color: var(--color-muted);
-    font-style: italic;
-    font-size: 0.85rem;
+    margin-bottom: var(--space-xs);
+}
+
+#quick-add-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+button.quick-add-btn {
+    background-color: var(--color-surface);
+    color: var(--color-accent);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--radius-pill);
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
+}
+
+button.quick-add-btn:hover {
+    background-color: var(--color-accent-light);
+}
+
+button.quick-add-btn.added {
+    background-color: var(--color-accent-light);
+    color: var(--color-muted);
+    border-style: solid;
+    border-color: var(--color-accent-border);
+    cursor: default;
 }
 
 /* =========================================================
-   8. TESTED PRODUCTS: SEARCH & FILTER CONTROLS
+   9. STATS PILLS
+   ========================================================= */
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: var(--space-sm);
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    line-height: 1.2;
+    color: var(--color-muted);
+    background-color: var(--color-accent-light);
+    border: 1px solid var(--color-accent-border);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+}
+
+.stat-pill strong {
+    color: var(--color-text);
+}
+
+.stat-pill.stat-safe {
+    background-color: var(--color-safe-bg);
+    color: var(--color-safe);
+    border-color: rgba(21, 128, 61, 0.25);
+}
+
+.stat-pill.stat-avoid {
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+    border-color: rgba(180, 35, 24, 0.25);
+}
+
+.stat-pill.stat-safe strong,
+.stat-pill.stat-avoid strong {
+    color: inherit;
+}
+
+/* =========================================================
+   10. CHECK PRODUCT RESULTS
+   ========================================================= */
+.result-alert {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    margin-top: var(--space-md);
+    border-radius: var(--radius-md);
+}
+
+.result-alert button {
+    align-self: flex-start;
+}
+
+.alert-safe {
+    background-color: var(--color-safe-bg);
+    border: 1px solid var(--color-safe);
+    color: var(--color-safe);
+}
+
+.alert-danger {
+    background-color: var(--color-danger-bg);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+}
+
+.alert-warning {
+    background-color: var(--color-accent-light);
+    border: 1px solid var(--color-accent-border);
+    color: var(--color-text);
+}
+
+/* Ingredient breakdown: every ingredient as a chip, flagged ones in red */
+.ingredient-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.ingredient-chip {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-muted);
+    border: 1px solid var(--color-accent-border);
+}
+
+.ingredient-chip.ingredient-flagged {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: var(--color-surface);
+    font-weight: 600;
+}
+
+/* =========================================================
+   11. TESTED PRODUCTS (SEARCH, FILTERS, LIST)
    ========================================================= */
 .history-controls {
     display: flex;
@@ -394,8 +634,6 @@ button.filter-btn {
     border-radius: var(--radius-pill);
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
     transition: all 0.2s ease;
 }
 
@@ -413,48 +651,13 @@ button.filter-btn.active {
 button.filter-btn.filter-safe-btn.active {
     background-color: var(--color-safe);
     border-color: var(--color-safe);
-    color: #ffffff;
 }
 
 button.filter-btn.filter-avoid-btn.active {
     background-color: var(--color-danger);
     border-color: var(--color-danger);
-    color: #ffffff;
 }
 
-/* --- Checker Result Boxes --- */
-.result-alert {
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    margin-top: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-}
-
-.alert-safe {
-    background-color: var(--color-safe-bg);
-    border: 1px solid var(--color-safe);
-    color: var(--color-safe);
-}
-
-.alert-danger {
-    background-color: var(--color-danger-bg);
-    border: 1px solid var(--color-danger);
-    color: var(--color-danger);
-}
-
-.alert-warning {
-    background-color: var(--color-accent-light);
-    border: 1px solid var(--color-accent-border);
-    color: var(--color-text);
-}
-
-.result-alert button {
-    align-self: flex-start;
-}
-
-/* --- History List Styles --- */
 #history-list {
     list-style: none;
     display: flex;
@@ -467,11 +670,11 @@ button.filter-btn.filter-avoid-btn.active {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 0.75rem;
     padding: var(--space-sm) var(--space-md);
     border: 1px solid var(--color-accent-border);
     border-radius: var(--radius-md);
     background-color: var(--color-surface);
-    gap: 0.75rem;
 }
 
 .history-info {
@@ -495,6 +698,12 @@ button.filter-btn.filter-avoid-btn.active {
     font-weight: 500;
 }
 
+.history-notes {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    font-style: italic;
+}
+
 .category-badge {
     display: inline-block;
     font-size: 0.68rem;
@@ -509,12 +718,6 @@ button.filter-btn.filter-avoid-btn.active {
     vertical-align: middle;
 }
 
-.history-notes {
-    font-size: 0.8rem;
-    color: var(--color-muted);
-    font-style: italic;
-}
-
 .badge-safe {
     color: var(--color-safe);
     font-weight: 600;
@@ -526,68 +729,368 @@ button.filter-btn.filter-avoid-btn.active {
 }
 
 /* =========================================================
-   9. BUTTONS
+   12. ALLERGEN INSIGHTS (SAFETY METER)
    ========================================================= */
-button {
-    font: inherit;
+.safety-gauge-container {
+    margin-bottom: var(--space-md);
+}
+
+.safety-gauge-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: var(--space-sm) var(--space-lg);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    background-color: var(--color-accent);
-    color: #ffffff;
-    transition: background-color 0.2s ease;
+    margin-bottom: 0.35rem;
 }
 
-button:hover {
-    background-color: var(--color-accent-hover);
+.gauge-track {
+    width: 100%;
+    height: 10px;
+    background-color: var(--color-accent-light);
+    border: 1px solid var(--color-accent-border);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
 }
 
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.gauge-fill {
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-safe);
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
-/* Minimalist delete button for tags & history */
-button.delete-btn {
-    background: transparent;
-    border: none;
+.insights-summary {
+    font-size: 0.85rem;
     color: var(--color-muted);
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 2px 6px;
-    cursor: pointer;
+    background-color: var(--color-bg);
+    padding: var(--space-sm);
     border-radius: var(--radius-md);
-    transition: color 0.2s ease;
-}
-
-button.delete-btn:hover {
-    color: var(--color-danger);
-    text-decoration: underline;
-}
-
-.allergen-tag button.delete-btn {
-    font-size: 1.1rem;
-    margin-left: 0.25rem;
-    padding: 0;
-    color: var(--color-danger);
-    line-height: 1;
+    border: 1px dashed var(--color-accent-border);
 }
 
 /* =========================================================
-   10. RESPONSIVE
+   13. INSIGHTS CHARTS
    ========================================================= */
-@media (min-width: 769px) and (max-width: 1024px) {
-    main,
-    .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.chart-title {
+    font-size: 1rem;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-xs);
 }
 
+.chart-subtitle {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-sm);
+}
+
+.chart-legend {
+    display: flex;
+    gap: var(--space-md);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-sm);
+}
+
+.chart-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+}
+
+.swatch-safe  { background-color: var(--color-safe); }
+.swatch-avoid { background-color: var(--color-danger); }
+
+.bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+/* One row = label | bar | number */
+.bar-row {
+    display: grid;
+    grid-template-columns: minmax(70px, 30%) 1fr auto;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+}
+
+.bar-label {
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bar-value {
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.bar-track {
+    height: 12px;
+    background-color: var(--color-accent-light);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background-color: var(--color-accent);
+    border-radius: 0 4px 4px 0;
+    transition: width 0.4s ease;
+}
+
+/* Stacked bar: safe + avoid side by side with a small gap */
+.bar-track-stacked {
+    display: flex;
+    gap: 2px;
+    background-color: transparent;
+}
+
+.bar-track-stacked .bar-fill {
+    border-radius: 4px;
+}
+
+.bar-safe  { background-color: var(--color-safe); }
+.bar-avoid { background-color: var(--color-danger); }
+
+.bar-row:hover .bar-fill {
+    filter: brightness(1.1);
+}
+
+/* =========================================================
+   14. REACTION JOURNAL
+   ========================================================= */
+.page-intro {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.chart-title-first {
+    margin-top: 0;
+}
+
+#reaction-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.severity-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.sev-low {
+    background-color: var(--color-accent-light);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+}
+
+.sev-medium {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid rgba(146, 64, 14, 0.25);
+}
+
+.sev-high {
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid rgba(180, 35, 24, 0.25);
+}
+
+body.theme-dark .sev-medium {
+    background-color: #3a2e12;
+    color: #fcd34d;
+}
+
+/* =========================================================
+   15. ALLERGEN DIRECTORY PAGE
+   ========================================================= */
+.directory-page {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    padding: 0 var(--space-lg);
+}
+
+.directory-intro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.directory-intro h2 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-xs);
+}
+
+#directory-search {
+    max-width: 320px;
+    margin-bottom: 0;
+}
+
+/* Hidden on screen but still read by screen readers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.directory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.allergen-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-accent-border);
+    border-top: 4px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-sm);
+}
+
+.card-header h3 {
+    font-size: 1.25rem;
+}
+
+.found-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.found-yes {
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.found-no {
+    background-color: var(--color-safe-bg);
+    color: var(--color-safe);
+}
+
+.card-about {
+    font-size: 0.85rem;
+    color: var(--color-text);
+    margin-bottom: 0;
+}
+
+.card-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    margin-bottom: 2px;
+}
+
+.card-text {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+.card-muted {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+.name-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.name-chip {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-accent-light);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+}
+
+.card-footer {
+    border-top: 1px dashed var(--color-accent-border);
+    padding-top: var(--space-sm);
+    margin-top: var(--space-xs);
+}
+
+.card-products {
+    list-style: none;
+    font-size: 0.85rem;
+    color: var(--color-danger);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.directory-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-xl);
+    background-color: var(--color-surface);
+    border: 1px dashed var(--color-accent-border);
+    border-radius: var(--radius-md);
+    color: var(--color-muted);
+}
+
+.directory-empty-link {
+    font-weight: 600;
+}
+
+/* =========================================================
+   16. RESPONSIVE
+   ========================================================= */
 @media (max-width: 768px) {
-    main,
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    .directory-page {
+        padding: 0 var(--space-md);
+    }
+
+    #directory-search {
+        max-width: none;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
     }
 }

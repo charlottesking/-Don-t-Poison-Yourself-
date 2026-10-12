@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☠️ Don't Poison Yourself ☠️ | Reaction Journal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <!-- Header & Navigation -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>
+                <span aria-hidden="true">☠️</span> Don't Poison Yourself
+                <span class="title-skull-end" aria-hidden="true">☠️</span>
+            </h1>
+
+            <div class="header-actions">
+                <button type="button" id="export-btn" class="header-btn" aria-label="Export your data as a CSV file">
+                    <span aria-hidden="true">⬇</span>
+                    <span class="btn-text">Export CSV</span>
+                </button>
+                <button type="button" id="theme-toggle" class="header-btn" aria-label="Toggle dark mode">
+                    <span class="show-when-light" aria-hidden="true">🌙</span>
+                    <span class="show-when-dark" aria-hidden="true">☀️</span>
+                    <span class="btn-text show-when-light">Dark Mode</span>
+                    <span class="btn-text show-when-dark">Light Mode</span>
+                </button>
+            </div>
+
+            <nav class="nav-links" aria-label="Pages">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="journal.html" class="nav-link">Journal</a>
+                <a href="directory.html" class="nav-link">Directory</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Reaction Journal Page -->
+    <main id="main-content" class="dashboard-grid">
+
+        <!-- Widget 1: Log a Reaction -->
+        <section class="widget">
+            <h2>Log a Reaction</h2>
+            <p class="page-intro">Had a reaction to a product? Write it down here so you can spot patterns over time.</p>
+            <form id="reaction-form">
+                <label for="reaction-product">Product <span class="required-star">*</span></label>
+                <input type="text" id="reaction-product" list="product-suggestions" placeholder="e.g. Daily Facial Cleanser" required>
+                <datalist id="product-suggestions"></datalist>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reaction-date">Date</label>
+                        <input type="date" id="reaction-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reaction-area">Body area</label>
+                        <select id="reaction-area">
+                            <option value="Face">Face</option>
+                            <option value="Scalp">Scalp</option>
+                            <option value="Eyes">Eyes</option>
+                            <option value="Lips">Lips</option>
+                            <option value="Hands">Hands</option>
+                            <option value="Body">Body</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label for="reaction-severity">Severity</label>
+                <select id="reaction-severity">
+                    <option value="1">1 – Mild</option>
+                    <option value="2">2 – Noticeable</option>
+                    <option value="3" selected>3 – Moderate</option>
+                    <option value="4">4 – Strong</option>
+                    <option value="5">5 – Severe</option>
+                </select>
+
+                <label for="reaction-notes">What happened?</label>
+                <input type="text" id="reaction-notes" placeholder="e.g. Red, itchy rash after 2 hours">
+
+                <button type="submit">Log Reaction</button>
+            </form>
+        </section>
+
+        <!-- Widget 2: Your Reactions -->
+        <section class="widget">
+            <h2>Your Reactions</h2>
+            <div id="reaction-stats"></div>
+            <ul id="reaction-list"></ul>
+        </section>
+
+        <!-- Widget 3: Reaction Trends -->
+        <section class="widget">
+            <h2>Reaction Trends</h2>
+            <h3 class="chart-title chart-title-first">Reactions by Month</h3>
+            <p class="chart-subtitle">Last 6 months</p>
+            <div id="reaction-chart" class="bar-chart"></div>
+        </section>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

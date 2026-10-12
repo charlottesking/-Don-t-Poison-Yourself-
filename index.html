@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☠️Don't Poison Yourself☠️ | Allergen Dashboard</title>
+    <title>☠️ Don't Poison Yourself ☠️ | Allergen Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <!-- Header & Dark Mode Toggle -->
+    <!-- Header & Navigation -->
     <header class="dashboard-header">
         <div class="header-content">
-            <h1>☠️Don't Poison Yourself☠️</h1>
-            <button type="button" id="theme-toggle">Toggle Dark Mode</button>
+            <h1>
+                <span aria-hidden="true">☠️</span> Don't Poison Yourself
+                <span class="title-skull-end" aria-hidden="true">☠️</span>
+            </h1>
+
+            <div class="header-actions">
+                <button type="button" id="export-btn" class="header-btn" aria-label="Export your data as a CSV file">
+                    <span aria-hidden="true">⬇</span>
+                    <span class="btn-text">Export CSV</span>
+                </button>
+                <button type="button" id="theme-toggle" class="header-btn" aria-label="Toggle dark mode">
+                    <span class="show-when-light" aria-hidden="true">🌙</span>
+                    <span class="show-when-dark" aria-hidden="true">☀️</span>
+                    <span class="btn-text show-when-light">Dark Mode</span>
+                    <span class="btn-text show-when-dark">Light Mode</span>
+                </button>
+            </div>
+
+            <nav class="nav-links" aria-label="Pages">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="journal.html" class="nav-link">Journal</a>
+                <a href="directory.html" class="nav-link">Directory</a>
+            </nav>
         </div>
     </header>
 
-    <!-- Main 3-Widget Dashboard Container -->
-    <main class="dashboard-grid">
+    <!-- Main Dashboard Container -->
+    <main id="main-content" class="dashboard-grid">
 
         <!-- Widget 1: My Allergies -->
         <section class="widget">
@@ -29,47 +51,48 @@
                     <button type="submit">Add</button>
                 </div>
             </form>
+            <p class="quick-add-label">Or tap to add a common allergen:</p>
+            <div id="quick-add-list"></div>
             <div id="allergen-stats"></div>
             <ul id="allergen-list"></ul>
         </section>
 
-       <!-- Widget 2: Check Product -->
-<section class="widget">
-    <h2>Check Product</h2>
-    <form id="checker-form">
-        <label for="product-name">Product name <span class="required-star">*</span></label>
-        <input type="text" id="product-name" placeholder="e.g. Daily Facial Cleanser" required>
+        <!-- Widget 2: Check Product -->
+        <section class="widget">
+            <h2>Check Product</h2>
+            <form id="checker-form">
+                <label for="product-name">Product name <span class="required-star">*</span></label>
+                <input type="text" id="product-name" placeholder="e.g. Daily Facial Cleanser" required>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="product-brand">Brand / Maker</label>
-                <input type="text" id="product-brand" placeholder="e.g. CeraVe">
-            </div>
-            <div class="form-group">
-                <label for="product-category">Type</label>
-                <select id="product-category">
-                    <option value="">Select type...</option>
-                    <option value="Skincare">Skincare</option>
-                    <option value="Haircare">Haircare</option>
-                    <option value="Body & Soap">Body & Soap</option>
-                    <option value="Makeup">Makeup</option>
-                    <option value="Household">Household</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="product-brand">Brand / Maker</label>
+                        <input type="text" id="product-brand" placeholder="e.g. CeraVe">
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Type</label>
+                        <select id="product-category">
+                            <option value="">Select type...</option>
+                            <option value="Skincare">Skincare</option>
+                            <option value="Haircare">Haircare</option>
+                            <option value="Body & Soap">Body & Soap</option>
+                            <option value="Makeup">Makeup</option>
+                            <option value="Household">Household</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
 
-        <label for="product-notes">Notes</label>
-        <input type="text" id="product-notes" placeholder="e.g. Bought on sale, patch test passed">
+                <label for="product-notes">Notes</label>
+                <input type="text" id="product-notes" placeholder="e.g. Bought on sale, patch test passed">
 
-        <label for="ingredients-input">Paste ingredient list <span class="required-star">*</span></label>
-        <textarea id="ingredients-input" rows="4" placeholder="Water, Glycerin, Fragrance..." required></textarea>
+                <label for="ingredients-input">Paste ingredient list <span class="required-star">*</span></label>
+                <textarea id="ingredients-input" rows="4" placeholder="Water, Glycerin, Fragrance..." required></textarea>
 
-        <button type="submit">Check</button>
-    </form>
-    <div id="checker-result"></div>
-</section>
-
+                <button type="submit">Check</button>
+            </form>
+            <div id="checker-result"></div>
+        </section>
 
         <!-- Widget 3: Tested Products -->
         <section class="widget">
@@ -90,6 +113,36 @@
 
             <!-- Tested Products List -->
             <ul id="history-list"></ul>
+        </section>
+
+        <!-- Widget 4: Allergen Insights -->
+        <section class="widget" id="insights-widget">
+            <h2>Allergen Insights</h2>
+            <div class="safety-gauge-container">
+                <div class="safety-gauge-header">
+                    <span>Safety Score</span>
+                    <span id="safety-percent">100%</span>
+                </div>
+                <div class="gauge-track">
+                    <div id="gauge-bar" class="gauge-fill"></div>
+                </div>
+            </div>
+            <div class="insights-summary">
+                <p id="top-trigger-text">No trigger ingredients found yet.</p>
+            </div>
+
+            <!-- Chart 1: which allergens show up most -->
+            <h3 class="chart-title">Top Triggers</h3>
+            <p class="chart-subtitle">How many tested products contained each allergen</p>
+            <div id="trigger-chart" class="bar-chart"></div>
+
+            <!-- Chart 2: safe vs avoid for each product type -->
+            <h3 class="chart-title">Results by Product Type</h3>
+            <div class="chart-legend" aria-hidden="true">
+                <span><span class="legend-swatch swatch-safe"></span>Safe</span>
+                <span><span class="legend-swatch swatch-avoid"></span>Avoid</span>
+            </div>
+            <div id="category-chart" class="bar-chart"></div>
         </section>
 
     </main>

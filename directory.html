@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☠️ Don't Poison Yourself ☠️ | Allergen Directory</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <!-- Header & Navigation -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>
+                <span aria-hidden="true">☠️</span> Don't Poison Yourself
+                <span class="title-skull-end" aria-hidden="true">☠️</span>
+            </h1>
+
+            <div class="header-actions">
+                <button type="button" id="export-btn" class="header-btn" aria-label="Export your data as a CSV file">
+                    <span aria-hidden="true">⬇</span>
+                    <span class="btn-text">Export CSV</span>
+                </button>
+                <button type="button" id="theme-toggle" class="header-btn" aria-label="Toggle dark mode">
+                    <span class="show-when-light" aria-hidden="true">🌙</span>
+                    <span class="show-when-dark" aria-hidden="true">☀️</span>
+                    <span class="btn-text show-when-light">Dark Mode</span>
+                    <span class="btn-text show-when-dark">Light Mode</span>
+                </button>
+            </div>
+
+            <nav class="nav-links" aria-label="Pages">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="journal.html" class="nav-link">Journal</a>
+                <a href="directory.html" class="nav-link">Directory</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Allergen Directory Page -->
+    <main id="main-content" class="directory-page">
+
+        <section class="directory-intro">
+            <div>
+                <h2>Allergen Directory</h2>
+                <p id="directory-summary" class="page-intro">Everything you need to know about your allergens.</p>
+            </div>
+            <label for="directory-search" class="visually-hidden">Search your allergens</label>
+            <input type="text" id="directory-search" placeholder="Search your allergens...">
+        </section>
+
+        <div id="directory-grid" class="directory-grid"></div>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
